@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Call with PeerJS</title>
+  <!-- Adicione o link para o CSS do Bootstrap aqui -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+
+  <h1 class="mb-4">Video Call</h1>
+
+  <div class="row">
+    <div class="col-md-6">
+      <video id="localVideo" class="w-100" autoplay playsinline muted></video>
+      <button class="btn btn-danger mt-2" onclick="encerrarChamada()">Encerrar Chamada</button>
+      <button class="btn btn-primary mt-2" onclick="toggleMicrofone()">Toggle Microfone</button>
+      <button class="btn btn-primary mt-2" onclick="toggleCamera()">Toggle Câmera</button>
+    </div>
+
+    <div class="col-md-6">
+      <video id="remoteVideo" class="w-100" autoplay playsinline></video>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+
+  <script>
+    // Configuração do Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyBasM456saPpEgU4MczT8tvpQ0yAW-jWno",
+      authDomain: "imagine-arte.firebaseapp.com",
+      databaseURL: "https://imagine-arte-default-rtdb.firebaseio.com",
+      projectId: "imagine-arte",
+      storageBucket: "imagine-arte.appspot.com",
+      messagingSenderId: "87793415326",
+      appId: "1:87793415326:web:8f8dee3f5146a5b96af78f",
+      measurementId: "G-P3DJZ7XR9N"
+    };
+
+    // Inicialização do Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Obtém uma referência para o banco de dados
+    var database = firebase.database();
+
+    // Obtém uma referência para o nó "pares" no Firebase
+    var paresRef = database.ref('pares');
+
+    // Gera um ID automaticamente usando o Firebase
+    var chamadaId = generateFirebaseId();
+    var localPeerId = generateFirebaseId();
+    var stream;
+
+    // Adiciona o ID gerado ao Firebase
+    paresRef.child(localPeerId).set({
+      chamadaId: chamadaId,
+      disponivel: true
+    });
+
+    // Crie um par (Peer) com o ID gerado
+    var peer = new Peer(localPeerId, { key: 'peerjs', host: 'peerjs.com', secure: true, port: 443 });
+
+    // Solicitar permissão para acessar a câmera e o microfone
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(function (userStream) {
+        stream = userStream; // Atribuição à variável global
+        var localVideo = document.getElementById('localVideo');
+        localVideo.srcObject = stream;
+        localVideo.muted = true; // Evita feedback de áudio
+
+        // Chame a função para iniciar uma chamada aleatória após obter a stream
+        startRandomCall();
+      })
+      .catch(function (error) {
+        console.error('Erro ao obter permissões:', error);
+      });
+
+    // Ao receber uma chamada, responda com o stream local
+    peer.on('call', function (call) {
+      call.answer(stream);
+
+      // Ao receber o stream remoto, exiba-o
+      call.on('stream', function (remoteStream) {
+        var remoteVideo = document.getElementById('remoteVideo');
+        remoteVideo.srcObject = remoteStream;
+      });
+
+      // Marque a solicitação do primeiro usuário como indisponível
+      paresRef.child(call.peer).update({
+        disponivel: false
+      });
+    });
+
+    // Ao fechar a chamada, marque o par como indisponível e exclua do Firebase
+    peer.on('close', function() {
+      paresRef.child(localPeerId).update({
+        disponivel: false
+      });
+      paresRef.child(localPeerId).remove();
+    });
+
+    // Função para iniciar uma chamada aleatória
+    function startRandomCall() {
+      paresRef.orderByChild('disponivel').equalTo(true).once('value', function(snapshot) {
+        var paresDisponiveis = snapshot.val();
+
+        // Se não houver pares disponíveis, marque-se como disponível
+        if (!paresDisponiveis) {
+          paresRef.child(localPeerId).update({
+            disponivel: true
+          });
+          console.log("Você foi marcado como disponível para uma chamada.");
+          return;
+        }
+
+        // Se houver pares disponíveis, escolha aleatoriamente um deles
+        var paresKeys = Object.keys(paresDisponiveis);
+        var randomRemotePeerId = paresKeys[Math.floor(Math.random() * paresKeys.length)];
+
+        // Inicie uma chamada com o par escolhido aleatoriamente
+        var call = peer.call(randomRemotePeerId, stream);
+
+        // Ao receber o stream remoto, exiba-o
+        call.on('stream', function (remoteStream) {
+          var remoteVideo = document.getElementById('remoteVideo');
+          remoteVideo.srcObject = remoteStream;
+        });
+
+        // Marque a solicitação do primeiro usuário como indisponível
+        paresRef.child(randomRemotePeerId).update({
+          disponivel: false
+        });
+      });
+    }
+
+    // Encerrar a chamada
+    function encerrarChamada() {
+      // Desconectar o par (Peer)
+      peer.disconnect();
+
+      // Parar os fluxos de vídeo local e remoto
+      var localStream = document.getElementById('localVideo').srcObject;
+      var remoteStream = document.getElementById('remoteVideo').srcObject;
+
+      if (localStream) {
+        var tracks = localStream.getTracks();
+        tracks.forEach(track => track.stop());
+      }
+
+      if (remoteStream) {
+        var tracks = remoteStream.getTracks();
+        tracks.forEach(track => track.stop());
+      }
+
+      // Remover a entrada do Firebase
+      paresRef.child(localPeerId).remove();
+
+      // Iniciar automaticamente outra chamada
+      startRandomCall();
+    }
+
+    // Alternar o microfone (mudo/desmutar)
+    function toggleMicrofone() {
+      var localStream = localVideo.srcObject;
+      var audioTracks = localStream.getAudioTracks();
+      audioTracks.forEach(track => (track.enabled = !track.enabled));
+    }
+
+    // Alternar a câmera (ativa/desativa)
+    function toggleCamera() {
+      var localStream = localVideo.srcObject;
+      var videoTracks = localStream.getVideoTracks();
+      videoTracks.forEach(track => (track.enabled = !track.enabled));
+    }
+
+    // Função para gerar um ID aleatório usando o Firebase
+    function generateFirebaseId() {
+      return database.ref().push().key;
+    }
+
+  </script>
+</body>
+</html>
