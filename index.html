@@ -21,6 +21,7 @@
         <input type="text" id="friendIdInput" class="form-control mb-2">
         <button onclick="callFriend()" class="btn btn-primary">Iniciar Chamada</button>
         <p id="callStatus"></p>
+        <p id="errorStatus" style="color: red;"></p>
         <video id="remoteVideo" width="100%" autoplay playsinline></video>
       </div>
     </div>
@@ -30,11 +31,20 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
   <script>
-    const peer = new Peer();
+    const peer = new Peer(undefined, {
+      // Adicione sua chave de API PeerJS abaixo (opcional, se estiver usando uma)
+      key: 'YOUR_PEERJS_API_KEY',
+      debug: 3 // Nível de depuração
+    });
+
     let localStream, remoteStream;
 
     peer.on('open', (id) => {
       document.getElementById('yourId').innerText = id;
+    });
+
+    peer.on('error', (error) => {
+      document.getElementById('errorStatus').innerText = 'Erro de conexão com o servidor PeerJS: ' + error;
     });
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -42,7 +52,9 @@
         localStream = stream;
         document.getElementById('localVideo').srcObject = stream;
       })
-      .catch(error => console.error('Erro ao obter acesso à câmera/microfone:', error));
+      .catch(error => {
+        document.getElementById('errorStatus').innerText = 'Erro ao obter acesso à câmera/microfone: ' + error;
+      });
 
     peer.on('call', (incomingCall) => {
       document.getElementById('callStatus').innerText = 'Recebendo chamada...';
