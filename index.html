@@ -20,6 +20,7 @@
         <p>Digite o ID do seu amigo:</p>
         <input type="text" id="friendIdInput" class="form-control mb-2">
         <button onclick="callFriend()" class="btn btn-primary">Iniciar Chamada</button>
+        <p id="callStatus"></p>
         <video id="remoteVideo" width="100%" autoplay playsinline></video>
       </div>
     </div>
@@ -30,6 +31,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
   <script>
     const peer = new Peer();
+    let localStream, remoteStream;
 
     peer.on('open', (id) => {
       document.getElementById('yourId').innerText = id;
@@ -37,17 +39,20 @@
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
+        localStream = stream;
         document.getElementById('localVideo').srcObject = stream;
       })
       .catch(error => console.error('Erro ao obter acesso à câmera/microfone:', error));
 
     peer.on('call', (incomingCall) => {
+      document.getElementById('callStatus').innerText = 'Recebendo chamada...';
       incomingCall.answer(localStream);
       handleCall(incomingCall);
     });
 
     function callFriend() {
       const friendId = document.getElementById('friendIdInput').value;
+      document.getElementById('callStatus').innerText = 'Chamada iniciada...';
       const outgoingCall = peer.call(friendId, localStream);
 
       handleCall(outgoingCall);
@@ -55,10 +60,12 @@
 
     function handleCall(call) {
       call.on('stream', (stream) => {
+        document.getElementById('callStatus').innerText = 'Chamada estabelecida!';
         document.getElementById('remoteVideo').srcObject = stream;
       });
 
       call.on('close', () => {
+        document.getElementById('callStatus').innerText = 'Chamada encerrada';
         remoteStream.getTracks().forEach(track => track.stop());
       });
     }
