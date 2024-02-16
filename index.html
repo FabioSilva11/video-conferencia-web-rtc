@@ -11,10 +11,12 @@
     <input type="text" id="partnerId" placeholder="Insira o ID do Parceiro">
     <button onclick="startVideoCall()">Iniciar Chamada</button>
     <video id="videoElement" width="640" height="480" style="border: 1px solid #000;" autoplay></video>
+    <p id="errorMessage" style="color: red;"></p>
 
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2"></script>
     <script>
         const peer = new Peer();
+        const errorMessageElement = document.getElementById('errorMessage');
 
         peer.on('open', function (id) {
             document.getElementById('peerId').innerText = id;
@@ -22,6 +24,11 @@
 
         function startVideoCall() {
             const partnerId = document.getElementById('partnerId').value;
+
+            if (!partnerId) {
+                errorMessageElement.innerText = 'Informe o ID do Parceiro.';
+                return;
+            }
 
             navigator.mediaDevices.getUserMedia({ video: true, audio: true })
                 .then(function (mediaStream) {
@@ -31,9 +38,16 @@
                         const videoElement = document.getElementById('videoElement');
                         videoElement.srcObject = remoteStream;
                     });
+
+                    call.on('close', function () {
+                        // Adicionando um tratamento para encerramento da chamada, se necessário.
+                        console.log('Chamada encerrada');
+                    });
+
+                    errorMessageElement.innerText = ''; // Limpar mensagens de erro
                 })
                 .catch(function (err) {
-                    console.error('Erro ao obter a mídia:', err);
+                    errorMessageElement.innerText = 'Erro ao obter a mídia: ' + err.message;
                 });
         }
     </script>
