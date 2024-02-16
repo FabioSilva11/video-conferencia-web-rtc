@@ -6,7 +6,7 @@
     <title>Chamada de Vídeo</title>
 </head>
 <body>
-    <p>Seu ID de Par é: <span id="peerId"></span></p>
+    <p>Seu ID de Par é: <span id="peerIdPlaceholder">Aguarde...</span></p>
     <label for="partnerId">ID do Parceiro:</label>
     <input type="text" id="partnerId" placeholder="Insira o ID do Parceiro">
     <button onclick="startVideoCall()">Iniciar Chamada</button>
@@ -16,10 +16,11 @@
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2"></script>
     <script>
         const peer = new Peer();
+        const peerIdPlaceholder = document.getElementById('peerIdPlaceholder');
         const errorMessageElement = document.getElementById('errorMessage');
 
         peer.on('open', function (id) {
-            document.getElementById('peerId').innerText = id;
+            peerIdPlaceholder.innerText = id;
         });
 
         function startVideoCall() {
