@@ -1,82 +1,141 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Call</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <title>PeerJS - Video chat example</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  <script type="text/javascript" src="../../dist/peer.js"></script>
+  <script>
+
+    // Compatibility shim
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+    // PeerJS object
+    var peer = new Peer({ key: 'lwjd5qra8257b9', debug: 3});
+    console.log("index.html >> peer object created...");
+
+    peer.on('open', function(){
+      console.log("index.html >> on open socket...");
+      $('#my-id').text(peer.id);
+    });
+
+    // Receiving a call
+    peer.on('call', function(call){
+      // Answer the call automatically (instead of prompting user) for demo purposes
+      call.answer(window.localStream);
+      step3(call);
+    });
+    peer.on('error', function(err){
+      alert(err.message);
+      // Return to step 2 if error occurs
+      step2();
+    });
+
+    // Click handlers setup
+    $(function(){
+      $('#make-call').click(function(){
+        // Initiate a call!
+        var call = peer.call($('#callto-id').val(), window.localStream);
+
+        step3(call);
+      });
+
+      $('#end-call').click(function(){
+        window.existingCall.close();
+        step2();
+      });
+
+      // Retry if getUserMedia fails
+      $('#step1-retry').click(function(){
+        $('#step1-error').hide();
+        step1();
+      });
+
+      // Get things started
+      step1();
+    });
+
+    function step1 () {
+      // Get audio/video stream
+      navigator.getUserMedia({audio: true, video: true}, function(stream){
+        // Set your video displays
+        $('#my-video').prop('src', URL.createObjectURL(stream));
+
+        window.localStream = stream;
+        step2();
+      }, function(){ $('#step1-error').show(); });
+    }
+
+    function step2 () {
+      $('#step1, #step3').hide();
+      $('#step2').show();
+    }
+
+    function step3 (call) {
+      // Hang up on an existing call if present
+      if (window.existingCall) {
+        window.existingCall.close();
+      }
+
+      // Wait for stream on the call, then set peer video display
+      call.on('stream', function(stream){
+        $('#their-video').prop('src', URL.createObjectURL(stream));
+      });
+
+      // UI stuff
+      window.existingCall = call;
+      $('#their-id').text(call.peer);
+      call.on('close', step2);
+      $('#step1, #step2').hide();
+      $('#step3').show();
+    }
+
+  </script>
+
+
 </head>
+
 <body>
 
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col-md-6">
-        <h2>Você</h2>
-        <p>Seu ID: <span id="yourId"></span></p>
-        <video id="localVideo" width="100%" autoplay playsinline></video>
-      </div>
-      <div class="col-md-6">
-        <h2>Amigo</h2>
-        <p>Digite o ID do seu amigo:</p>
-        <input type="text" id="friendIdInput" class="form-control mb-2">
-        <button onclick="callFriend()" class="btn btn-primary">Iniciar Chamada</button>
-        <p id="callStatus"></p>
-        <p id="errorStatus" style="color: red;"></p>
-        <video id="remoteVideo" width="100%" autoplay playsinline></video>
-      </div>
-    </div>
+<div class="pure-g">
+
+  <!-- Video area -->
+  <div class="pure-u-2-3" id="video-container">
+    <video id="their-video" autoplay></video>
+    <video id="my-video" muted="true" autoplay></video>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
-  <script>
-    const peer = new Peer();
+  <!-- Steps -->
+  <div class="pure-u-1-3">
+    <h2>PeerJS Video Chat</h2>
 
-    let localStream, remoteStream;
+    <!-- Get local audio/video stream -->
+    <div id="step1">
+      <p>Please click `allow` on the top of the screen so we can access your webcam and microphone for calls.</p>
+      <div id="step1-error">
+        <p>Failed to access the webcam and microphone. Make sure to run this demo on an http server and click allow when asked for permission by the browser.</p>
+        <a href="#" class="pure-button pure-button-error" id="step1-retry">Try again</a>
+      </div>
+    </div>
 
-    peer.on('open', (id) => {
-      document.getElementById('yourId').innerText = id;
-    });
+    <!-- Make calls to others -->
+    <div id="step2">
+      <p>Your id: <span id="my-id">...</span></p>
+      <p>Share this id with others so they can call you.</p>
+      <h3>Make a call</h3>
+      <div class="pure-form">
+        <input type="text" placeholder="Call user id..." id="callto-id">
+        <a href="#" class="pure-button pure-button-success" id="make-call">Call</a>
+      </div>
+    </div>
 
-    peer.on('error', (error) => {
-      document.getElementById('errorStatus').innerText = 'Erro de conexão com o servidor PeerJS: ' + error;
-    });
+    <!-- Call in progress -->
+    <div id="step3">
+      <p>Currently in call with <span id="their-id">...</span></p>
+      <p><a href="#" class="pure-button pure-button-error" id="end-call">End call</a></p>
+    </div>
+  </div>
+</div>
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        localStream = stream;
-        document.getElementById('localVideo').srcObject = stream;
-      })
-      .catch(error => {
-        document.getElementById('errorStatus').innerText = 'Erro ao obter acesso à câmera/microfone: ' + error;
-      });
 
-    peer.on('call', (incomingCall) => {
-      document.getElementById('callStatus').innerText = 'Recebendo chamada...';
-      incomingCall.answer(localStream);
-      handleCall(incomingCall);
-    });
-
-    function callFriend() {
-      const friendId = document.getElementById('friendIdInput').value;
-      document.getElementById('callStatus').innerText = 'Chamada iniciada...';
-      const outgoingCall = peer.call(friendId, localStream);
-
-      handleCall(outgoingCall);
-    }
-
-    function handleCall(call) {
-      call.on('stream', (stream) => {
-        document.getElementById('callStatus').innerText = 'Chamada estabelecida!';
-        document.getElementById('remoteVideo').srcObject = stream;
-      });
-
-      call.on('close', () => {
-        document.getElementById('callStatus').innerText = 'Chamada encerrada';
-        remoteStream.getTracks().forEach(track => track.stop());
-      });
-    }
-  </script>
 </body>
 </html>
