@@ -1,56 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chamada de Vídeo</title>
+    <title>Delta Meet</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
+
 <body>
-    <p>Seu ID de Par é: <span id="peerIdPlaceholder">Aguarde...</span></p>
-    <label for="partnerId">ID do Parceiro:</label>
-    <input type="text" id="partnerId" placeholder="Insira o ID do Parceiro">
-    <button onclick="startVideoCall()">Iniciar Chamada</button>
-    <video id="videoElement" width="640" height="480" style="border: 1px solid #000;" autoplay></video>
-    <p id="errorMessage" style="color: red;"></p>
+    <h1 class="title">Delta Meet</h1>
+    <p id="notification" hidden></p>
+    <div class="entry-modal" id="entry-modal">
+        <p>Create or Join Meeting</p>
+        <input id="room-input" class="room-input" placeholder="Enter Room ID">
+        <div>
+            <button onclick="createRoom()">Create Room</button>
+            <button onclick="joinRoom()">Join Room</button>
+        </div>
+    </div>
+    <div class="meet-area">
+        <!-- Remote Video Element-->
+        <video id="remote-video"></video>
 
-    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2"></script>
-    <script>
-        const peer = new Peer();
-        const peerIdPlaceholder = document.getElementById('peerIdPlaceholder');
-        const errorMessageElement = document.getElementById('errorMessage');
-
-        peer.on('open', function (id) {
-            peerIdPlaceholder.innerText = id;
-        });
-
-        function startVideoCall() {
-            const partnerId = document.getElementById('partnerId').value;
-
-            if (!partnerId) {
-                errorMessageElement.innerText = 'Informe o ID do Parceiro.';
-                return;
-            }
-
-            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-                .then(function (mediaStream) {
-                    const call = peer.call(partnerId, mediaStream);
-
-                    call.on('stream', function (remoteStream) {
-                        const videoElement = document.getElementById('videoElement');
-                        videoElement.srcObject = remoteStream;
-                    });
-
-                    call.on('close', function () {
-                        // Adicionando um tratamento para encerramento da chamada, se necessário.
-                        console.log('Chamada encerrada');
-                    });
-
-                    errorMessageElement.innerText = ''; // Limpar mensagens de erro
-                })
-                .catch(function (err) {
-                    errorMessageElement.innerText = 'Erro ao obter a mídia: ' + err.message;
-                });
-        }
-    </script>
+        <!-- Local Video Element-->
+        <video id="local-video"></video>
+        <div class="meet-controls-bar">
+            <button onclick="startScreenShare()">Screen Share</button>
+        </div>
+    </div>
 </body>
+
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+<script src="script.js"></script>
+
 </html>
