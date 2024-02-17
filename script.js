@@ -7,6 +7,13 @@ let local_stream; // Variável para armazenar o stream local
 let peer = null; // Objeto para gerenciar a comunicação peer-to-peer
 let currentPeer = null; // Variável para armazenar o objeto de chamada atual
 
+// Adicione as credenciais do servidor TURN aqui
+let turnConfig = {
+    iceServers: [
+        { urls: "turn:a.relay.metered.ca:443?transport=tcp", username: "83eebabf8b4cce9d5dbcb649", credential: "2D7JvfkOQtBdYW3R" }
+    ]
+};
+
 // Função para criar uma sala
 function createRoom() {
     console.log("Creating Room");
@@ -17,7 +24,7 @@ function createRoom() {
     }
     room_id = PREFIX + room + SUFFIX;
     console.log("Room ID:", room_id); // Novo log adicionado
-    peer = new Peer(room_id);
+    peer = new Peer(room_id, { config: turnConfig });
     peer.on('open', (id) => {
         console.log("Peer Connected with ID:", id);
         hideModal();
@@ -65,6 +72,8 @@ function setRemoteStream(stream) {
     }
 }
 
+// Restante do seu script permanece inalterado
+
 // Função para ocultar o modal de entrada
 function hideModal() {
     document.getElementById("entry-modal").hidden = true;
@@ -91,7 +100,7 @@ function joinRoom() {
     room_id = PREFIX + room + SUFFIX;
     console.log("Room ID:", room_id); // Novo log adicionado
     hideModal();
-    peer = new Peer();
+    peer = new Peer({ config: turnConfig });
     peer.on('open', (id) => {
         console.log("Connected with Id: " + id);
         getUserMedia({ video: true, audio: true }, (stream) => {
