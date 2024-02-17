@@ -1,5 +1,3 @@
-# README
-
 ## Integração do Firebase Database para Projeto de Videoconferência e chamada de video aleatoria
 
 Este projeto tem como objetivo utiliza o Firebase Database para armazenar informações relacionadas às salas de vídeo conferência. para posibilitar chamadas de video como as do omigle Abaixo estão as funções principais e sua explicação:
