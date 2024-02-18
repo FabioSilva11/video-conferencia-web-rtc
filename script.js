@@ -110,6 +110,7 @@ function createRoom() {
     console.log("recebendo chamada de video"); // Novo log adicionado
     call.answer(local_stream);
     call.on('stream', (stream) => {
+      console.log('Recebendo stream remoto:', stream);
       setRemoteStream(stream);
     });
     currentPeer = call;
@@ -167,7 +168,7 @@ function joinRoom(roomId) {
     .catch(function (error) {
       console.error('Erro ao excluir a sala:', error);
     });
-  peer = new Peer({ config: turnConfig });
+  peer = new Peer(room_id, { config: turnConfig });
 
   // Evento disparado quando a conexão do Peer é aberta
   peer.on('open', (id) => {
@@ -179,6 +180,7 @@ function joinRoom(roomId) {
       setLocalStream(local_stream);
       let call = peer.call(room_id, stream);
       call.on('stream', (stream) => {
+        console.log('Recebendo stream remoto:', stream);
         setRemoteStream(stream);
         excluirSala();
     });
