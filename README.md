@@ -93,6 +93,6 @@ Atualmente, o projeto está configurado para ser acessível online, permitindo q
 
 ## Como Contribuir
 
-Fique à vontade para contribuir com melhorias, correções de bugs ou sugestões. Abra problemas (issues) ou envie pull requests para colaborar no desenvolvimento deste projeto.
+Sinta-se à vontade para contribuir com melhorias, correções de bugs ou sugestões. Abra problemas (issues) ou envie pull requests para colaborar no desenvolvimento deste projeto.
 
-Agradecemos pela sua colaboração!
+Agradecemos pela sua colaboração! Caso note problemas de compatibilidade em alguns navegadores, como no iPhone (iOS), por favor, relate. Até o momento, foi testado no Xiaomi Redmi Note e no PC, mas é necessário verificar a compatibilidade em outros dispositivos e navegadores.
