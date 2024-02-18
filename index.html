@@ -3,56 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VisionX</title>
+    <title>Friens</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
 
 <div class="container mt-5">
-    <div class="row">
-        <div class="col-md-6">
-            <h1 class="mb-4">Integração do Firebase Database para Projeto de Videoconferência e chamada de vídeo aleatório</h1>
-
-            <div class="modal fade" id="entry-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <!-- Conteúdo do modal permanece o mesmo -->
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <form class="needs-validation" novalidate>
-                <div class="mb-3">
-                    <label for="room-input" class="form-label">Digite o Número da Sala:</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="room-input" required>
-                        <div class="invalid-feedback">Por favor, digite um número de sala válido.</div>
-                    </div>
-                </div>
-                <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-success mb-3" onclick="joinRoom()">Entrar na Sala</button>
-                    <button type="button" class="btn btn-primary" onclick="createRoom()">Criar Sala</button>
-                </div>
-            </form>
-        </div>
+    <div class="text-center">
+        <h1 class="display-3">Friends</h1>
+        <h3 class="mb-4">Bate papo com estranhos</h3>
     </div>
+
+    <form class="needs-validation" novalidate>
+        <div class="d-grid gap-2">
+            <button type="button" class="btn btn-success mb-3" onclick="startRandomCall()">
+                <i class="bi bi-telephone-fill"></i> Nova Chamada
+            </button>
+        </div>
+    </form>
 
     <div class="row mt-5">
         <div class="col-md-6">
-            <h2 class="mb-4">Vídeo Local</h2>
+            <h2>Vídeo Local</h2>
             <video id="local-video" class="w-100 border rounded" autoplay></video>
         </div>
 
         <div class="col-md-6">
-            <h2 class="mb-4">Vídeo Remoto</h2>
+            <h2>Vídeo Remoto</h2>
             <video id="remote-video" class="w-100 border rounded" autoplay></video>
 
             <div class="alert alert-info mt-4" role="alert" id="notification" hidden></div>
         </div>
     </div>
+
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h2>Comentários</h2>
+
+            <div class="media mb-3">
+                <i class="bi bi-person-fill me-3"></i>
+                <div class="media-body">
+                    <p class="mb-0"><strong>Usuário1:</strong> Ótima chamada! Adorei conhecer novas pessoas.</p>
+                </div>
+            </div>
+
+            <div class="media mb-3">
+                <i class="bi bi-person-fill me-3"></i>
+                <div class="media-body">
+                    <p class="mb-0"><strong>Usuário2:</strong> A qualidade do vídeo é incrível. Estou viciado!</p>
+                </div>
+            </div>
+
+            <!-- Adicione mais comentários conforme necessário -->
+
+            <form class="mb-4">
+                <div class="mb-3">
+                    <i class="bi bi-person me-2"></i>
+                    <label for="username" class="form-label">Nome de Usuário:</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="mb-3">
+                    <i class="bi bi-chat-dots me-2"></i>
+                    <label for="comment" class="form-label">Comentário:</label>
+                    <textarea class="form-control" id="comment" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-chat-dots-fill"></i> Enviar Comentário
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-r5z+xCgNu12L4j3pVZP5JSwx1znKjaa7JsQ8iMqN7eI4JpzglGGpZNCcxJXaGBf" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.3.2/dist/peerjs.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
