@@ -1,92 +1,106 @@
-// Adicione as credenciais do servidor TURN aqui
-let turnConfig = {
-    iceServers: [
-        { urls: "turn:a.relay.metered.ca:443?transport=tcp", username: "83eebabf8b4cce9d5dbcb649", credential: "2D7JvfkOQtBdYW3R" }
-    ]
-};
-
-let peer;
-let localStream; // Variável para armazenar a stream local
-
-// Função para obter a stream local
-async function getLocalStream() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        localStream = stream;
-        document.getElementById('local-video').srcObject = stream;
-    } catch (error) {
-        console.error('Erro ao obter a stream local:', error);
-    }
-}
+// Declarar a variável peer fora das funções para que seja acessível globalmente
+var peer;
+let localMediaStream = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
 // Função para criar uma sala
 function createRoom() {
-    // Obter o valor do campo de entrada (room ID)
     const roomId = document.getElementById('room-input').value.trim();
 
-    if (roomId) {
-        // Inicializar o objeto Peer com a configuração de servidor TURN e o ID da sala
-        peer = new Peer(roomId, { config: turnConfig });
+    // Certifique-se de ter o objeto mediaStream disponível
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(function(mediaStream) {
+            localMediaStream = mediaStream;
 
-        // Evento disparado quando a conexão Peer é aberta (open)
-        peer.on('open', (peerId) => {
-            console.log('Conexão Peer aberta. ID:', peerId);
-            // Implemente aqui a lógica adicional, como exibir o ID em algum lugar na interface do usuário
-        });
+            peer = new Peer(roomId);
 
-        // Evento disparado quando uma chamada é recebida
-        peer.on('call', (incomingCall) => {
-            console.log('Chamada recebida. Respondendo...');
-
-            // Responder à chamada com a stream local
-            incomingCall.answer(localStream);
-
-            // Evento disparado quando a chamada é estabelecida
-            incomingCall.on('stream', (remoteStream) => {
-                // Exibir a stream remota no elemento de vídeo
-                document.getElementById('remote-video').srcObject = remoteStream;
+            peer.on('error', function(err) {
+                console.log('Erro no Peer:', err);
             });
-        });
 
-        // Evento disparado quando ocorre um erro
-        peer.on('error', (error) => {
-            console.error('Erro na conexão Peer:', error);
-        });
+            peer.on('open', function(id) {
+                console.log('Sala criada com sucesso! ID da sala:', id);
+            });
 
-        // Implementar lógica adicional, se necessário
-    } else {
-        console.error('ID da sala não pode estar vazio.');
-    }
+            peer.on('call', function(call) {
+                // Atende a chamada, fornecendo nosso mediaStream
+                call.answer(localMediaStream);
+                var video_local = document.getElementById('local-video');
+
+                // Define o stream de mídia no elemento de vídeo local
+                video_local.srcObject = localMediaStream;
+
+                // Inicia a reprodução do vídeo local
+                video_local.play();
+
+                call.on('stream', function(remoteStream) {
+                    console.log('Stream recebido do chamador:', remoteStream);
+                    var remoteVideo = document.getElementById('remote-video');
+
+                    // Define o stream de mídia no elemento de vídeo remoto
+                    remoteVideo.srcObject = remoteStream;
+
+                    // Inicia a reprodução do vídeo remoto
+                    remoteVideo.play();
+                });
+            });
+        })
+        .catch(function(err) {
+            console.log('Erro ao obter o stream de mídia:', err);
+        });
 }
 
 // Função para entrar em uma sala
 function joinRoom() {
-    // Obter o valor do campo de entrada (room ID)
-    const roomId = document.getElementById('room-input').value.trim();
+    const destPeerId = document.getElementById('room-input').value.trim();
 
-    if (roomId) {
-        // Inicializar o objeto Peer com a configuração de servidor TURN
-        peer = new Peer({ config: turnConfig });
+    // Certifique-se de ter o objeto mediaStream disponível
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(function(mediaStream) {
+            localMediaStream = mediaStream;
 
-        // Evento disparado quando a conexão do Peer é aberta
-        peer.on('open', (id) => {
-            console.log("Connected with Id: " + id); // Log indicando que a conexão foi estabelecida com sucesso
-            // Obtém acesso à mídia local (vídeo e áudio)
-            getUserMedia({ video: true, audio: true }, (stream) => {
-                let call = peer.call(roomId, stream);
-                call.on('stream', (remoteStream) => {
-                    console.log('Recebendo stream remoto:', remoteStream);
-                    // Faça algo com a stream remota, por exemplo, exibir no elemento de vídeo
-                    document.getElementById('remote-video').srcObject = remoteStream;
-                });
-            }, (err) => {
-                console.log("Error accessing local media:", err); // Log de erro caso haja problema ao acessar a mídia local
+            peer = new Peer();
+
+            peer.on('error', function(err) {
+                console.log('Erro no Peer:', err);
             });
-        });
-    } else {
-        console.error('ID da sala não pode estar vazio.');
-    }
-}
 
-// Chamar a função getLocalStream no início ou em resposta a uma ação do usuário
-getLocalStream();
+            peer.on('open', function(id) {
+                console.log('Conectado à sala com sucesso! ID do peer:', id);
+
+                // Iniciar uma conexão com o peer da sala (destPeerId)
+                var conn = peer.connect(destPeerId);
+
+                conn.on('open', function() {
+                    console.log('Conexão estabelecida com sucesso!');
+
+                    // Iniciar a chamada de vídeo
+                    var call = peer.call(destPeerId, localMediaStream);
+                    var video_local = document.getElementById('local-video');
+
+                    // Define o stream de mídia no elemento de vídeo local
+                    video_local.srcObject = localMediaStream;
+
+                    // Inicia a reprodução do vídeo local
+                    video_local.play();
+
+                    call.on('stream', function(remoteStream) {
+                        console.log('Stream recebido do chamador:', remoteStream);
+                        var remoteVideo = document.getElementById('remote-video');
+
+                        // Define o stream de mídia no elemento de vídeo remoto
+                        remoteVideo.srcObject = remoteStream;
+
+                        // Inicia a reprodução do vídeo remoto
+                        remoteVideo.play();
+                    });
+                });
+
+                conn.on('error', function(err) {
+                    console.log('Erro na conexão:', err);
+                });
+            });
+        })
+        .catch(function(err) {
+            console.log('Erro ao obter o stream de mídia:', err);
+        });
+}
