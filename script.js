@@ -117,30 +117,34 @@ function createRoom() {
   });
 }
 
-// Função para definir o stream local no elemento de vídeo
+
 function setLocalStream(stream) {
-  let video = document.getElementById("local-video");
+  const video = document.getElementById("local-video");
   video.srcObject = stream;
   video.muted = true;
-  video.play();
-  console.log("streaming local definido no elemento");
+  video.play().then(() => {
+    console.log("Streaming local iniciado com sucesso");
+  }).catch((error) => {
+    console.error("Erro ao iniciar o streaming local:", error);
+  });
 }
 
-// Função para definir o stream remoto no elemento de vídeo
 function setRemoteStream(stream) {
-  console.log("Setting remote stream");
-  let video = document.getElementById("remote-video");
+  const video = document.getElementById("remote-video");
   if (video) {
     video.srcObject = stream;
     video.play().then(() => {
-      console.log("Remote video playback started successfully");
+      console.log("Reprodução do vídeo remoto iniciada com sucesso");
     }).catch((error) => {
-      console.error("Error starting remote video playback:", error);
+      console.error("Erro ao iniciar a reprodução do vídeo remoto:", error);
     });
   } else {
-    console.error("Remote video element not found");
+    console.error("Elemento de vídeo remoto não encontrado");
   }
 }
+
+
+
 
 
 
