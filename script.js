@@ -169,12 +169,9 @@ function joinRoom(roomId) {
       console.error('Erro ao excluir a sala:', error);
     });
   peer = new Peer(room_id, { config: turnConfig });
-
   // Evento disparado quando a conexão do Peer é aberta
   peer.on('open', (id) => {
-    console.log("Connected with Id: " + id); // Log indicando que a conexão foi estabelecida com sucesso
-
-    // Obtém acesso à mídia local (vídeo e áudio)
+    console.log("Connected with Id: " + id);
     getUserMedia({ video: true, audio: true }, (stream) => {
       local_stream = stream;
       setLocalStream(local_stream);
@@ -183,10 +180,10 @@ function joinRoom(roomId) {
         console.log('Recebendo stream remoto:', stream);
         setRemoteStream(stream);
         excluirSala();
-    });
+      });
       currentPeer = call;
     }, (err) => {
-      console.log("Error accessing local media:", err); // Log de erro caso haja problema ao acessar a mídia local
+      console.log("Error accessing local media:", err);
     });
   });
 }
