@@ -85,7 +85,6 @@ A função `joinRoom` permite que um usuário entre em uma sala existente para p
 8. Inicia uma chamada de vídeo para o par de destino usando `peer.call(destPeerId, localMediaStream)`.
 9. Adiciona manipuladores de eventos para tratar o stream remoto recebido, exibindo-o no elemento HTML adequado.
 10. Inclui lógica para encerrar a chamada quando o botão com o ID "end-call-button" é clicado.
-```
 
 
 ## Execução Online
