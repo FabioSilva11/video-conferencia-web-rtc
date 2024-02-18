@@ -88,11 +88,11 @@ A função `joinRoom` permite que um usuário entre em uma sala existente para p
 ```
 
 
-# Execução Online
+## Execução Online
 
 Atualmente, o projeto está configurado para ser acessível online, permitindo que qualquer pessoa no mundo faça chamadas.
 
-# Como Contribuir
+## Como Contribuir
 
 Fique à vontade para contribuir com melhorias, correções de bugs ou sugestões. Abra problemas (issues) ou envie pull requests para colaborar no desenvolvimento deste projeto.
 
