@@ -1,194 +1,188 @@
-// Configuração fictícia do Firebase (não remover)
-var firebaseConfig = {
-  apiKey: "AIzaSyBasM456saPpEgU4MczT8tvpQ0yAW-jWno",
-  authDomain: "imagine-arte.firebaseapp.com",
-  databaseURL: "https://imagine-arte-default-rtdb.firebaseio.com",
-  projectId: "imagine-arte",
-  storageBucket: "imagine-arte.appspot.com",
-  messagingSenderId: "87793415326",
-  appId: "1:87793415326:web:8f8dee3f5146a5b96af78f",
-  measurementId: "G-P3DJZ7XR9N"
-};
+// Declarar a variável peer fora das funções para que seja acessível globalmente
+var peer;
+let localMediaStream =
+  navigator.getUserMedia ||
+  navigator.webkitGetUserMedia ||
+  navigator.mozGetUserMedia;
 
-// Definindo constantes para o prefixo e sufixo do room_id
-const PREFIX = "DELTA";
-const SUFFIX = "MEET";
-let room_id; // Variável para armazenar o identificador da sala
-let getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia; // Obtendo a função getUserMedia com suporte a navegadores
-let local_stream; // Variável para armazenar o stream local
-let peer = null; // Objeto para gerenciar a comunicação peer-to-peer
-let currentPeer = null; // Variável para armazenar o objeto de chamada atual
 
-// Inicialização do Firebase
-firebase.initializeApp(firebaseConfig);
-// Obtém uma referência para o banco de dados
-var database = firebase.database();
-// Obtém uma referência para o nó "pares" no Firebase
-var paresRef = database.ref('pares');
+var devInfo = document.getElementById("info-messages");
 
-function startRandomCall() {
-  console.log("clicadoo.");
-  paresRef.once('value').then(function (snapshot) {
-    var users = snapshot.val();
-
-    if (users === null) {
-      // Faça algo quando não houver dados
-      createRoom();
-    } else {
-      const salas = users;
-
-      let disponiveis = 0;
-
-      // Conta quantas salas estão disponíveis
-      for (const salaId in salas) {
-        if (salas[salaId].disponivel) {
-          disponiveis++;
-        }
-      }
-
-      if (disponiveis > 0) {
-        // Sorteia um número entre 0 e disponiveis - 1
-        const indiceSorteado = Math.floor(Math.random() * disponiveis);
-
-        // Encontra a sala correspondente ao índice sorteado
-        let contador = 0;
-        let salaSorteadaId;
-
-        for (const salaId in salas) {
-          if (salas[salaId].disponivel) {
-            if (contador === indiceSorteado) {
-              salaSorteadaId = salaId;
-              break;
-            }
-            contador++;
-          }
-        }
-
-        console.log(`Sala sorteada: ${salaSorteadaId}`);
-        joinRoom(salaSorteadaId);
-      } else {
-        console.log("Não há salas disponíveis para sorteio.");
-        createRoom();
-      }
-
-    }
-  });
-}
 
 // Adicione as credenciais do servidor TURN aqui
 let turnConfig = {
   iceServers: [
-    { urls: "turn:a.relay.metered.ca:443?transport=tcp", username: "83eebabf8b4cce9d5dbcb649", credential: "2D7JvfkOQtBdYW3R" }
-  ]
+    {
+      urls: "turn:a.relay.metered.ca:443?transport=tcp",
+      username: "83eebabf8b4cce9d5dbcb649",
+      credential: "2D7JvfkOQtBdYW3R",
+    },
+  ],
 };
+
+function toggleLog() {
+  var logDiv = document.getElementById("log");
+  logDiv.style.display = (logDiv.style.display === "none" || logDiv.style.display === "") ? "block" : "none";
+}
 
 // Função para criar uma sala
 function createRoom() {
-  console.log("Criando nova sala");
-  var novaChave = paresRef.push().key;
-  var novosDados = {
-    sala_Id: novaChave,
-    disponivel: true
-  };
-  paresRef.child(novaChave).set(novosDados);
-  let room = novaChave;
-  room_id = PREFIX + room + SUFFIX;
-  console.log("ID da sala:", room_id); // Novo log adicionado
-  peer = new Peer(room_id, { config: turnConfig });
-  peer.on('open', (id) => {
-    console.log("conectado ao pee id: ", id);
-    getUserMedia({ video: true, audio: true }, (stream) => {
-      local_stream = stream;
-      setLocalStream(local_stream);
-      console.log("Streaming local iniciado");
-    }, (err) => {
-      console.log("Erro ao acessar midia local:", err);
-    });
-    notify("Waiting for peer to join.");
-  });
-  peer.on('call', (call) => {
-    console.log("recebendo chamada de video"); // Novo log adicionado
-    call.answer(local_stream);
-    call.on('stream', (stream) => {
-      console.log('Recebendo stream remoto:', stream);
-      setRemoteStream(stream);
-    });
-    currentPeer = call;
-  });
-}
+  const roomId = document.getElementById("room-input").value.trim();
+  toggleLog();
 
+  // Certifique-se de ter o objeto mediaStream disponível
+  navigator.mediaDevices
+    .getUserMedia({ video: true, audio: true })
+    .then(function (mediaStream) {
+      localMediaStream = mediaStream;
 
-function setLocalStream(stream) {
-  const video = document.getElementById("local-video");
-  video.srcObject = stream;
-  video.muted = true;
-  video.play().then(() => {
-    console.log("Streaming local iniciado com sucesso");
-  }).catch((error) => {
-    console.error("Erro ao iniciar o streaming local:", error);
-  });
-}
+      peer = new Peer(roomId, { config: turnConfig });
 
-function setRemoteStream(stream) {
-  const video = document.getElementById("remote-video");
-  if (video) {
-    video.srcObject = stream;
-    video.play().then(() => {
-      console.log("Reprodução do vídeo remoto iniciada com sucesso");
-    }).catch((error) => {
-      console.error("Erro ao iniciar a reprodução do vídeo remoto:", error);
-    });
-  } else {
-    console.error("Elemento de vídeo remoto não encontrado");
-  }
-}
-
-
-
-
-
-
-// Função para exibir notificação
-function notify(msg) {
-  let notification = document.getElementById("notification");
-  notification.innerHTML = msg;
-  notification.hidden = false;
-  setTimeout(() => {
-    notification.hidden = true;
-  }, 3000);
-}
-
-// Função para entrar em uma sala, recebe o ID da sala como parâmetro
-function joinRoom(roomId) {
-  let room = roomId;
-  room_id = PREFIX + room + SUFFIX;
-  console.log("Room ID:", room_id); // Novo log adicionado
-  var chaveParaExcluir = room; // Use o ID da sala como chave para excluir
-
-  paresRef.child(chaveParaExcluir).remove()
-    .then(function () {
-      console.log('Sala excluída com sucesso.');
-    })
-    .catch(function (error) {
-      console.error('Erro ao excluir a sala:', error);
-    });
-  peer = new Peer(room_id, { config: turnConfig });
-  // Evento disparado quando a conexão do Peer é aberta
-  peer.on('open', (id) => {
-    console.log("Connected with Id: " + id);
-    getUserMedia({ video: true, audio: true }, (stream) => {
-      local_stream = stream;
-      setLocalStream(local_stream);
-      let call = peer.call(room_id, stream);
-      call.on('stream', (stream) => {
-        console.log('Recebendo stream remoto:', stream);
-        setRemoteStream(stream);
-        excluirSala();
+      peer.on("error", function (err) {
+        devInfo.innerHTML = "Erro no Peer:" + err;
       });
-      currentPeer = call;
-    }, (err) => {
-      console.log("Error accessing local media:", err);
+
+      peer.on("open", function (id) {
+        devInfo.innerHTML = "Sala criada com sucesso! ID da sala:" + id;
+      });
+
+      peer.on("call", function (call) {
+        // Armazenar a chamada para que possamos encerrá-la posteriormente se necessário
+        var currentCall = call;
+
+        // Atende a chamada, fornecendo nosso mediaStream
+        call.answer(localMediaStream);
+        navigator.mediaDevices
+          .getUserMedia({ video: true, audio: false })
+          .then(function (mediaStream) {
+            // Restante do código permanece o mesmo
+            localMediaStream = mediaStream;
+            var video_local = document.getElementById("local-video");
+            video_local.srcObject = localMediaStream;
+            video_local.play();
+          })
+          .catch(function (err) {
+            devInfo.innerHTML = "Erro ao obter o stream de mídia:" + err;
+          });
+
+        call.on("stream", function (remoteStream) {
+          devInfo.innerHTML = "Stream recebido do chamador:" + remoteStream;
+          var remoteVideo = document.getElementById("remote-video");
+
+          // Define o stream de mídia no elemento de vídeo remoto
+          remoteVideo.srcObject = remoteStream;
+
+          // Inicia a reprodução do vídeo remoto
+          remoteVideo.play();
+        });
+        peer.on('close', () => {
+          devInfo.innerHTML = "Conexão de video incerrada.";
+          var remoteVideo = document.getElementById("remote-video");
+          toggleLog();
+          // Adicione aqui a lógica que você deseja executar quando a conexão for fechada.
+        });
+
+        // Adicionar um botão ou lógica para encerrar a chamada
+        document
+          .getElementById("end-call-button")
+          .addEventListener("click", function () {
+            // Encerrar a chamada
+            if (peer) {
+              // Chama 'destroy' para fechar o par e suas conexões
+              peer.destroy();
+              devInfo.innerHTML = "Par destruído. Operações de limpeza concluídas.";
+            } else {
+              devInfo.innerHTML = "O par não está definido. Não é possível fechar.";
+            }
+          });
+      });
+    })
+    .catch(function (err) {
+      devInfo.innerHTML = "Erro ao obter o stream de mídia:" + err;
     });
-  });
 }
 
+// Função para entrar em uma sala
+function joinRoom() {
+  const destPeerId = document.getElementById("room-input").value.trim();
+  toggleLog();
+
+  // Certifique-se de ter o objeto mediaStream disponível
+  navigator.mediaDevices
+    .getUserMedia({ video: true, audio: true })
+    .then(function (mediaStream) {
+      localMediaStream = mediaStream;
+
+      peer = new Peer({ config: turnConfig });
+
+      peer.on("error", function (err) {
+        devInfo.innerHTML = "Erro no Peer:" + err;
+      });
+
+      peer.on("open", function (id) {
+        devInfo.innerHTML = "Conectado à sala com sucesso! ID do peer:" + id;
+
+        // Iniciar uma conexão com o peer da sala (destPeerId)
+        var conn = peer.connect(destPeerId);
+
+        conn.on("open", function () {
+          devInfo.innerHTML = "Conexão estabelecida com sucesso!";
+
+          // Iniciar a chamada de vídeo
+          var call = peer.call(destPeerId, localMediaStream);
+
+          navigator.mediaDevices
+            .getUserMedia({ video: true, audio: false })
+            .then(function (mediaStream) {
+              // Restante do código permanece o mesmo
+              localMediaStream = mediaStream;
+              var video_local = document.getElementById("local-video");
+              video_local.srcObject = localMediaStream;
+              video_local.play();
+            })
+            .catch(function (err) {
+              devInfo.innerHTML = "Erro ao obter o stream de mídia:" + err;
+            });
+
+          call.on("stream", function (remoteStream) {
+            devInfo.innerHTML = "Stream recebido do chamador:" + remoteStream;
+            var remoteVideo = document.getElementById("remote-video");
+
+            // Define o stream de mídia no elemento de vídeo remoto
+            remoteVideo.srcObject = remoteStream;
+
+            // Inicia a reprodução do vídeo remoto
+            remoteVideo.play();
+          });
+
+          peer.on('close', () => {
+            devInfo.innerHTML = "Conexão de video incerrada.";
+            var remoteVideo = document.getElementById("remote-video");
+            toggleLog();
+            // Adicione aqui a lógica que você deseja executar quando a conexão for fechada.
+          });
+
+          // Adicionar um botão ou lógica para encerrar a chamada
+          document
+            .getElementById("end-call-button")
+            .addEventListener("click", function () {
+              // Encerrar a chamada
+              if (peer) {
+                // Chama 'destroy' para fechar o par e suas conexões
+                peer.destroy();
+                devInfo.innerHTML = "Par destruído. Operações de limpeza concluídas.";
+              } else {
+                devInfo.innerHTML = "O par não está definido. Não é possível fechar.";
+              }
+            });
+        });
+
+        conn.on("error", function (err) {
+          devInfo.innerHTML = "Erro na conexão:" + err;
+        });
+      });
+    })
+    .catch(function (err) {
+      devInfo.innerHTML = "Erro ao obter o stream de mídia:" + err;
+    });
+}
