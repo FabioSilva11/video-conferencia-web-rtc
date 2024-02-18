@@ -22,15 +22,22 @@ function createRoom() {
             });
 
             peer.on('call', function(call) {
+                // Armazenar a chamada para que possamos encerrá-la posteriormente se necessário
+                var currentCall = call;
+
                 // Atende a chamada, fornecendo nosso mediaStream
                 call.answer(localMediaStream);
-                var video_local = document.getElementById('local-video');
-
-                // Define o stream de mídia no elemento de vídeo local
-                video_local.srcObject = localMediaStream;
-
-                // Inicia a reprodução do vídeo local
-                video_local.play();
+                navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                    .then(function(mediaStream) {
+                        // Restante do código permanece o mesmo
+                        localMediaStream = mediaStream;
+                        var video_local = document.getElementById('local-video');
+                        video_local.srcObject = localMediaStream;
+                        video_local.play();
+                    })
+                    .catch(function(err) {
+                        console.log('Erro ao obter o stream de mídia:', err);
+                    });
 
                 call.on('stream', function(remoteStream) {
                     console.log('Stream recebido do chamador:', remoteStream);
@@ -41,6 +48,12 @@ function createRoom() {
 
                     // Inicia a reprodução do vídeo remoto
                     remoteVideo.play();
+                });
+
+                // Adicionar um botão ou lógica para encerrar a chamada
+                document.getElementById('end-call-button').addEventListener('click', function() {
+                    // Encerrar a chamada
+                    currentCall.close();
                 });
             });
         })
@@ -75,13 +88,18 @@ function joinRoom() {
 
                     // Iniciar a chamada de vídeo
                     var call = peer.call(destPeerId, localMediaStream);
-                    var video_local = document.getElementById('local-video');
 
-                    // Define o stream de mídia no elemento de vídeo local
-                    video_local.srcObject = localMediaStream;
-
-                    // Inicia a reprodução do vídeo local
-                    video_local.play();
+                    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                        .then(function(mediaStream) {
+                            // Restante do código permanece o mesmo
+                            localMediaStream = mediaStream;
+                            var video_local = document.getElementById('local-video');
+                            video_local.srcObject = localMediaStream;
+                            video_local.play();
+                        })
+                        .catch(function(err) {
+                            console.log('Erro ao obter o stream de mídia:', err);
+                        });
 
                     call.on('stream', function(remoteStream) {
                         console.log('Stream recebido do chamador:', remoteStream);
@@ -92,6 +110,12 @@ function joinRoom() {
 
                         // Inicia a reprodução do vídeo remoto
                         remoteVideo.play();
+                    });
+
+                    // Adicionar um botão ou lógica para encerrar a chamada
+                    document.getElementById('end-call-button').addEventListener('click', function() {
+                        // Encerrar a chamada
+                        call.close();
                     });
                 });
 
