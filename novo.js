@@ -22,7 +22,25 @@ let turnConfig = {
 
 function toggleLog() {
   var logDiv = document.getElementById("log");
-  logDiv.style.display = (logDiv.style.display === "none" || logDiv.style.display === "") ? "block" : "none";
+  if (logDiv.style.display === "none") {
+    logDiv.style.display = "block";
+  } else if (logDiv.style.display === "block") {
+    logDiv.style.display = "none";
+  } else if (logDiv.style.display === "") {
+    logDiv.style.display = "none";
+  }
+}
+
+
+function toggleLogfinaly() {
+  var logDiv = document.getElementById("finaly");
+  if (logDiv.style.display === "none") {
+    logDiv.style.display = "block";
+  } else if (logDiv.style.display === "block") {
+    logDiv.style.display = "none";
+  } else if (logDiv.style.display === "") {
+    logDiv.style.display = "none";
+  }
 }
 
 // Função para criar uma sala
@@ -55,6 +73,7 @@ function createRoom() {
         navigator.mediaDevices
           .getUserMedia({ video: true, audio: false })
           .then(function (mediaStream) {
+            toggleLogfinaly();
             // Restante do código permanece o mesmo
             localMediaStream = mediaStream;
             var video_local = document.getElementById("local-video");
@@ -62,7 +81,8 @@ function createRoom() {
             video_local.play();
           })
           .catch(function (err) {
-            devInfo.innerHTML = "Erro ao obter o stream de mídia:" + err;
+            devInfo.innerHTML = "Erro ao obter o stream de mídia não é possivel fazer streamer";
+      toggleLog();
           });
 
         call.on("stream", function (remoteStream) {
@@ -98,7 +118,8 @@ function createRoom() {
       });
     })
     .catch(function (err) {
-      devInfo.innerHTML = "Erro ao obter o stream de mídia:" + err;
+      devInfo.innerHTML = "Erro ao obter o stream de mídia não é possivel fazer streamer";
+      toggleLog();
     });
 }
 
@@ -135,13 +156,15 @@ function joinRoom() {
             .getUserMedia({ video: true, audio: false })
             .then(function (mediaStream) {
               // Restante do código permanece o mesmo
+              toggleLogfinaly();
               localMediaStream = mediaStream;
               var video_local = document.getElementById("local-video");
               video_local.srcObject = localMediaStream;
               video_local.play();
             })
             .catch(function (err) {
-              devInfo.innerHTML = "Erro ao obter o stream de mídia:" + err;
+              devInfo.innerHTML = "Erro ao obter o stream de mídia não é possivel fazer streamer";
+      toggleLog();
             });
 
           call.on("stream", function (remoteStream) {
@@ -183,6 +206,7 @@ function joinRoom() {
       });
     })
     .catch(function (err) {
-      devInfo.innerHTML = "Erro ao obter o stream de mídia:" + err;
+      devInfo.innerHTML = "Erro ao obter o stream de mídia não é possivel fazer streamer";
+      toggleLog();
     });
 }
