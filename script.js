@@ -183,7 +183,7 @@ function joinRoom(roomId) {
       let call = peer.call(room_id, stream); // Inicia uma chamada ao Peer na sala com o stream local
       call.on('stream', (stream) => {
         excluirSala(); // Exclui a sala quando a chamada é conectada
-        setRemoteStream(stream); // Função para configurar o stream remoto na interface quando recebido
+        //setRemoteStream(stream); // Função para configurar o stream remoto na interface quando recebido
       });
 
       currentPeer = call; // Atribuição da chamada atual à variável 'currentPeer'
