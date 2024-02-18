@@ -2,6 +2,15 @@
 var peer;
 let localMediaStream = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
+// Adicione as credenciais do servidor TURN aqui
+let turnConfig = {
+    iceServers: [
+        { urls: "turn:a.relay.metered.ca:443?transport=tcp", username: "83eebabf8b4cce9d5dbcb649", credential: "2D7JvfkOQtBdYW3R" }
+    ]
+};
+
+
+
 // Função para criar uma sala
 function createRoom() {
     const roomId = document.getElementById('room-input').value.trim();
@@ -11,7 +20,7 @@ function createRoom() {
         .then(function(mediaStream) {
             localMediaStream = mediaStream;
 
-            peer = new Peer(roomId);
+            peer = new Peer(roomId, { config: turnConfig });
 
             peer.on('error', function(err) {
                 console.log('Erro no Peer:', err);
@@ -71,8 +80,9 @@ function joinRoom() {
         .then(function(mediaStream) {
             localMediaStream = mediaStream;
 
-            peer = new Peer();
+            peer = new Peer({ config: turnConfig });
 
+            
             peer.on('error', function(err) {
                 console.log('Erro no Peer:', err);
             });
