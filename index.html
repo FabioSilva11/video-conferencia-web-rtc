@@ -1,40 +1,22 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Delta Meet</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Chat</title>
 </head>
-
 <body>
-    <h1 class="title">Delta Meet</h1>
-    <p id="notification" hidden></p>
-    <div class="entry-modal" id="entry-modal">
-        <p>Create or Join Meeting</p>
-        <input id="room-input" class="room-input" placeholder="Enter Room ID">
-        <div>
-            <button onclick="createRoom()">Create Room</button>
-            <button onclick="joinRoom()">Join Room</button>
-        </div>
-    </div>
-    <div class="meet-area">
-        <!-- Remote Video Element-->
-        <video id="remote-video"></video>
 
-        <!-- Local Video Element-->
-        <video id="local-video"></video>
-        <div class="meet-controls-bar">
-            <button onclick="startScreenShare()">Screen Share</button>
-        </div>
-    </div>
-</body>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <input id="room-input" class="room-input" placeholder="Enter Room ID">
+    
+    <button onclick="createRoom()">Create Room</button>
+    <button onclick="joinRoom()">Join Room</button>
+
+    <video id="remote-video"></video>
+    <video id="local-video"></video>
+
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.3.2/dist/peerjs.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-    <script src="new.js"></script>
-</body>
+    <script src="novo.js"></script>
 
+</body>
 </html>
