@@ -142,6 +142,7 @@ function setRemoteStream(stream) {
 }
 
 
+
 // Função para exibir notificação
 function notify(msg) {
   let notification = document.getElementById("notification");
@@ -154,20 +155,18 @@ function notify(msg) {
 
 // Função para entrar em uma sala, recebe o ID da sala como parâmetro
 function joinRoom(roomId) {
-  console.log("Joining Room"); // Log indicando que a função está entrando na sala
   let room = roomId;
-  let room_id = PREFIX + room + SUFFIX; // Concatenação do prefixo, ID da sala e sufixo para formar o ID completo
+  room_id = PREFIX + room + SUFFIX;
+  console.log("Room ID:", room_id); // Novo log adicionado
   var chaveParaExcluir = room; // Use o ID da sala como chave para excluir
+
   paresRef.child(chaveParaExcluir).remove()
-    .then(function() {
+    .then(function () {
       console.log('Sala excluída com sucesso.');
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.error('Erro ao excluir a sala:', error);
     });
-
-  console.log("Room ID:", room_id); // Log exibindo o ID da sala completo (novo log adicionado)
-
   peer = new Peer({ config: turnConfig });
 
   // Evento disparado quando a conexão do Peer é aberta
@@ -176,17 +175,14 @@ function joinRoom(roomId) {
 
     // Obtém acesso à mídia local (vídeo e áudio)
     getUserMedia({ video: true, audio: true }, (stream) => {
-      local_stream = stream; // Atribuição do stream local à variável 'local_stream'
-      setLocalStream(local_stream); // Função para configurar o stream local na interface
-      notify("Joining peer"); // Notificação indicando que está se juntando ao par
-
-      let call = peer.call(room_id, stream); // Inicia uma chamada ao Peer na sala com o stream local
+      local_stream = stream;
+      setLocalStream(local_stream);
+      let call = peer.call(room_id, stream);
       call.on('stream', (stream) => {
-        excluirSala(); // Exclui a sala quando a chamada é conectada
-        //setRemoteStream(stream); // Função para configurar o stream remoto na interface quando recebido
-      });
-
-      currentPeer = call; // Atribuição da chamada atual à variável 'currentPeer'
+        setRemoteStream(stream);
+        excluirSala();
+    });
+      currentPeer = call;
     }, (err) => {
       console.log("Error accessing local media:", err); // Log de erro caso haja problema ao acessar a mídia local
     });
