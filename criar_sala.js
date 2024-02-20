@@ -1,4 +1,5 @@
 var peer;
+
 var devInfo = document.getElementById("info-messages");
 
 // Função para criar uma sala
@@ -46,6 +47,11 @@ function createRoom() {
           remoteVideo.play();
         });
 
+        call.on("close", function () {
+          devInfo.innerHTML = "Conexão de vídeo encerrada pelo outro lado.";
+          // Adicione aqui qualquer lógica adicional necessária ao encerrar a chamada.
+        });
+
         peer.on("close", () => {
           devInfo.innerHTML = "Conexão de vídeo encerrada.";
         });
@@ -53,11 +59,11 @@ function createRoom() {
         document
           .getElementById("end-call-button")
           .addEventListener("click", function () {
-            if (peer) {
-              peer.destroy();
-              devInfo.innerHTML = "a chamada de video vai ser encerrada";
+            if (currentCall) {
+              currentCall.close();
+              devInfo.innerHTML = "A chamada de vídeo será encerrada.";
             } else {
-              devInfo.innerHTML = "O par não está definido. Não é possível fechar.";
+              devInfo.innerHTML = "A chamada não está definida. Não é possível fechar.";
             }
           });
       });
