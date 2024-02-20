@@ -1,7 +1,7 @@
-let localMediaStream =
-  navigator.getUserMedia ||
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia;
+let localMediaStream = navigator.mediaDevices.getUserMedia ||
+                       navigator.webkitGetUserMedia ||
+                       navigator.mozGetUserMedia;
+
 
 // Adicione as credenciais do servidor TURN aqui
 let turnConfig = {
