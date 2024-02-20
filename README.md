@@ -42,20 +42,6 @@ let turnConfig = {
 };
 ```
 
-## Funções de Controle
-
-```javascript
-// Função para exibir ou ocultar o log
-function toggleLog(elementId) {
-  var logDiv = document.getElementById(elementId);
-  if (logDiv.style.display === "none" || logDiv.style.display === "") {
-    logDiv.style.display = "block";
-  } else {
-    logDiv.style.display = "none";
-  }
-}
-```
-
 ## Funções
 
 ### `createRoom()`
