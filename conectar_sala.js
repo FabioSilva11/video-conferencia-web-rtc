@@ -43,6 +43,11 @@ function joinRoom() {
             remoteVideo.play();
           });
 
+          call.on("close", function () {
+            devInfo.innerHTML = "Chamada de vídeo encerrada pelo outro lado.";
+            // Adicione aqui qualquer lógica adicional necessária ao encerrar a chamada.
+          });
+
           peer.on("close", () => {
             devInfo.innerHTML = "Chamada de vídeo encerrada.";
           });
@@ -52,7 +57,7 @@ function joinRoom() {
             .addEventListener("click", function () {
               if (peer) {
                 peer.destroy();
-                devInfo.innerHTML = "a chamada de video vai ser encerrada";
+                devInfo.innerHTML = "A chamada de vídeo será encerrada.";
               } else {
                 devInfo.innerHTML = "O par não está definido. Não é possível fechar.";
               }
