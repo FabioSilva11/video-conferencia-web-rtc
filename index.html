@@ -17,11 +17,11 @@
     <!-- Adicione um ícone representativo aqui -->
   </header>
 
-  <div class="container my-3">
+  <div class="container my-3" id="conteiner-mensege">
     <div id="info-messages" class="alert alert-info"></div>
   </div>
 
-  <div class="container" id="log">
+  <div class="container" id="conteiner-formulário">
     <div class="row">
       <div class="col-md-6 my-3">
         <input id="room-input" class="form-control" placeholder="Digite o ID da Sala" />
@@ -33,24 +33,26 @@
     </div>
   </div>
 
-  <div class="container" id="call">
+  <div class="container" id="conteiner-call">
     <div class="row">
       <div class="col-md-6 my-3 d-flex flex-column align-items-center justify-content-center">
         <div class="bg-light p-3">
           <span class="d-block text-center mb-2">ESTRANHO(A)</span>
-          <video id="remote-video" class="img-fluid"></video>
+          <video id="remote-video" class="img-fluid" style="width: 300px; height: 400px;"></video>
+
         </div>
       </div>
       <div class="col-md-6 my-3 d-flex flex-column align-items-center justify-content-center">
         <div class="bg-light p-3">
           <span class="d-block text-center mb-2">VOCÊ</span>
-          <video id="local-video" class="img-fluid"></video>
+          <video id="local-video" class="img-fluid" style="width: 300px; height: 400px;"></video>
+
         </div>
       </div>
     </div>
   </div>
 
-  <div class="container my-3">
+  <div class="container my-3" id="conteiner-encerrar-chamada">
     <button id="end-call-button" class="btn btn-danger btn-block">Encerrar Chamada</button>
   </div>
 
@@ -105,4 +107,5 @@
   <script src="conectar_sala.js"></script>
 </body>
                                                                    </html>
-                                                                   
+
+        
