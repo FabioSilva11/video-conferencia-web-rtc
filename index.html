@@ -14,12 +14,49 @@
   </head>
 
   <body>
-    <header class="bg-primary text-white text-center p-4">
-      <h1>Omegle Brasil</h1>
-      <!-- Adicione um ícone representativo aqui -->
+    <!-- Exemplo de header com logo usando Bootstrap -->
+    <header class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <img
+            src="https://logos-world.net/wp-content/uploads/2022/10/Omegle-Symbol.png"
+            alt="Logo do Meu Site"
+            width="50"
+            height="30"
+          />
+          Meu Site
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Início</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link scroll-to-sobre" href="#">Sobre</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Serviços</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link scroll-to-contatos" href="#">Contatos</a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </header>
 
-    <div class="container my-3" id="conteiner-mensege">
+    <div class="container my-3 text-center" id="conteiner-mensege">
       <div id="info-messages" class="alert alert-info"></div>
     </div>
 
@@ -79,56 +116,127 @@
     </div>
 
     <div class="container mt-5">
-      <h2 class="mb-4">Opiniões dos Usuários</h2>
+      <h2 class="mb-4 text-center">Opiniões dos Usuários</h2>
 
       <div class="card-deck">
-        <div class="card">
+        <div class="card shadow-lg">
+          <img
+            src="https://www.superedesafios.com.br/wp-content/uploads/2020/12/maneiras-de-ser-uma-pessoa-interessante-1-scaled.jpg"
+            class="card-img-top rounded-circle m-2"
+            alt="Imagem de Maria Silva"
+            style="width: 50px; height: 50px"
+          />
           <div class="card-body">
-            <h5 class="card-title">Maria Silva</h5>
+            <h5 class="card-title text-primary">Maria Silva</h5>
             <p class="card-text">
               Experiência incrível, a plataforma torna as reuniões realmente
               produtivas.
             </p>
           </div>
-          <div class="card-footer">
-            <small class="text-muted"
+          <div class="card-footer bg-transparent border-top-0 text-muted">
+            <small class="d-inline"
               >&#9733; &#9733; &#9733; &#9733; &#9733;</small
             >
           </div>
         </div>
       </div>
 
-      <div class="card-deck">
-        <div class="card">
+      <div class="card-deck mt-4">
+        <div class="card shadow-lg">
+          <img
+            src="https://media.licdn.com/dms/image/C4D03AQHsD5PUUyzl6A/profile-displayphoto-shrink_800_800/0/1661372089256?e=2147483647&v=beta&t=-m4n_Kg4FWiJT7sDuu2-hFgvudj26iCH13bbYfP1hKA"
+            class="card-img-top rounded-circle m-2"
+            alt="Imagem de João Oliveira"
+            style="width: 50px; height: 50px"
+          />
           <div class="card-body">
-            <h5 class="card-title">João Oliveira</h5>
+            <h5 class="card-title text-primary">João Oliveira</h5>
             <p class="card-text">
               Facilitou muito a comunicação, estou bastante satisfeito com a
               eficiência.
             </p>
           </div>
-          <div class="card-footer">
-            <small class="text-muted"
+          <div class="card-footer bg-transparent border-top-0 text-muted">
+            <small class="d-inline"
               >&#9733; &#9733; &#9733; &#9733; &#9733;</small
             >
           </div>
         </div>
       </div>
 
-      <div class="card-deck">
-        <div class="card">
+      <div class="card-deck mt-4">
+        <div class="card shadow-lg">
+          <img
+            src="https://blog.unyleya.edu.br/wp-content/uploads/2017/12/saiba-como-a-educacao-ajuda-voce-a-ser-uma-pessoa-melhor.jpeg"
+            class="card-img-top rounded-circle m-2"
+            alt="Imagem de Ana Rodrigues"
+            style="width: 50px; height: 50px"
+          />
           <div class="card-body">
-            <h5 class="card-title">Ana Rodrigues</h5>
+            <h5 class="card-title text-primary">Ana Rodrigues</h5>
             <p class="card-text">
               Excelente plataforma, tornou as reuniões mais dinâmicas e
               interativas.
             </p>
           </div>
-          <div class="card-footer">
-            <small class="text-muted"
+          <div class="card-footer bg-transparent border-top-0 text-muted">
+            <small class="d-inline"
               >&#9733; &#9733; &#9733; &#9733; &#9733;</small
             >
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sobre" class="container mt-4">
+      <h2 class="mb-4">Sobre o Omegle Brasil</h2>
+      <p class="lead">
+        O Omegle Brasil é uma plataforma de bate-papo online que permite que os
+        usuários conversem anonimamente com estranhos.
+      </p>
+      <p class="lead">Principais características:</p>
+      <ul class="list-group">
+        <li class="list-group-item">Conversas por vídeo disponíveis;</li>
+        <li class="list-group-item">Interação anônima;</li>
+        <li class="list-group-item">
+          Explore diferentes interesses e tópicos.
+        </li>
+      </ul>
+    </div>
+
+    <div id="contatos" class="container mt-4">
+      <h2 class="mb-4">Contatos</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <p class="lead">Entre em contato conosco para mais informações:</p>
+          <ul class="list-group">
+            <li class="list-group-item">
+              E-mail: produtorfabiosilva@gmail.com
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <p class="lead">Siga-nos nas redes sociais:</p>
+          <ul class="list-group">
+            <li class="list-group-item">
+              Facebook:
+              <a href="https://www.facebook.com/OmegleBrasil" target="_blank"
+                >@OmegleBrasil</a
+              >
+            </li>
+            <li class="list-group-item">
+              Twitter:
+              <a href="https://twitter.com/OmegleBrasilOficial" target="_blank"
+                >@OmegleBrasilOficial</a
+              >
+            </li>
+            <li class="list-group-item">
+              Instagram:
+              <a href="https://www.instagram.com/omegle_brasil/" target="_blank"
+                >@omegle_brasil</a
+              >
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -138,11 +246,32 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
       // Ocultar é mostrar as divs inicialmente
       document.getElementById("conteiner-formulário").style.display = "block";
       document.getElementById("conteiner-call").style.display = "none";
       document.getElementById("conteiner-encerrar-chamada").style.display = "none";
+
+      $(document).ready(function () {
+        $(".scroll-to-sobre").click(function () {
+          $("html, body").animate(
+            {
+              scrollTop: $("#sobre").offset().top,
+            },
+            1000
+          );
+        });
+
+        $(".scroll-to-contatos").click(function () {
+          $("html, body").animate(
+            {
+              scrollTop: $("#contatos").offset().top,
+            },
+            1000
+          );
+        });
+      });
     </script>
     <script src="variaveis.js"></script>
     <script src="criar_sala.js"></script>
