@@ -1,4 +1,5 @@
 var peer;
+var devInfo = document.getElementById("info-messages");
 
 // Função para entrar em uma sala
 function joinRoom() {
