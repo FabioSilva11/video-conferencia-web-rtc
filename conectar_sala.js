@@ -3,7 +3,7 @@ var devInfo = document.getElementById("info-messages");
 
 // Função para entrar em uma sala
 function joinRoom() {
-  const destPeerId = document.getElementById("room-input").value.trim();  
+  const destPeerId = document.getElementById("room-input").value.trim();
 
   navigator.mediaDevices
     .getUserMedia({ video: true, audio: true })
@@ -13,16 +13,20 @@ function joinRoom() {
       peer = new Peer({ config: turnConfig });
 
       peer.on("error", function (err) {
+        // Lógica de erro, se necessário
         devInfo.innerHTML = "Erro no Peer:" + err;
       });
 
       peer.on("open", function (id) {
-        devInfo.innerHTML = " Chamada Conectada";
-
         var conn = peer.connect(destPeerId);
 
         conn.on("open", function () {
-          devInfo.innerHTML = "Conexão estabelecida com sucesso!";
+          // Ocultar a div 'conteiner-formulário' durante a chamada
+          document.getElementById('conteiner-formulário').style.display = 'none';
+          
+          // Mostrar a div 'conteiner-call' onde a chamada é exibida
+          document.getElementById('conteiner-call').style.display = 'block';
+          document.getElementById('conteiner-encerrar-chamada').style.display = 'block';
 
           var call = peer.call(destPeerId, localMediaStream);
 
@@ -35,7 +39,8 @@ function joinRoom() {
               video_local.play();
             })
             .catch(function (err) {
-              devInfo.innerHTML = "Erro ao obter o stream de mídia não é possível fazer streamer";
+              // Lógica de erro ao obter o stream de mídia
+              devInfo.innerHTML = "Erro ao obter o stream de mídia, não é possível fazer streamer";
             });
 
           call.on("stream", function (remoteStream) {
@@ -45,11 +50,16 @@ function joinRoom() {
           });
 
           call.on("close", function () {
-            devInfo.innerHTML = "Chamada de vídeo encerrada pelo outro lado.";
-            // Adicione aqui qualquer lógica adicional necessária ao encerrar a chamada.
+            // Lógica de fechamento da chamada
+            document.getElementById('conteiner-formulário').style.display = 'block';
+            
+            // Oculta a div 'conteiner-call' onde a chamada é exibida
+            document.getElementById('conteiner-call').style.display = 'none';
+            document.getElementById('conteiner-encerrar-chamada').style.display = 'none';
           });
 
           peer.on("close", () => {
+            // Lógica de fechamento da chamada
             devInfo.innerHTML = "Chamada de vídeo encerrada.";
           });
 
@@ -58,19 +68,23 @@ function joinRoom() {
             .addEventListener("click", function () {
               if (peer) {
                 peer.destroy();
+                // Lógica de encerramento da chamada
                 devInfo.innerHTML = "A chamada de vídeo será encerrada.";
               } else {
+                // Lógica se o par não estiver definido
                 devInfo.innerHTML = "O par não está definido. Não é possível fechar.";
               }
             });
         });
 
         conn.on("error", function (err) {
+          // Lógica de erro na conexão
           devInfo.innerHTML = "Erro na conexão:" + err;
         });
       });
     })
     .catch(function (err) {
-      devInfo.innerHTML = "Erro ao obter o stream de mídia não é possível fazer streamer";
+      // Lógica de erro ao obter o stream de mídia
+      devInfo.innerHTML = "Erro ao obter o stream de mídia, não é possível fazer streamer";
     });
 }
