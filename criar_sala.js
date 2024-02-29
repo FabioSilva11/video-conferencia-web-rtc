@@ -1,5 +1,3 @@
-var peer;
-var devInfo = document.getElementById("info-messages");
 
 // Função para criar uma sala
 function createRoom() {
@@ -26,6 +24,13 @@ function createRoom() {
       });
 
       peer.on("call", function (call) {
+      
+      // Ocultar a div 'conteiner-formulário' durante a chamada
+          document.getElementById('conteiner-formulário').style.display = 'none';
+          
+          // Mostrar a div 'conteiner-call' onde a chamada é exibida
+          document.getElementById('conteiner-call').style.display = 'block';
+          document.getElementById('conteiner-encerrar-chamada').style.display = 'block';
         var currentCall = call;
 
         call.answer(localMediaStream);
@@ -36,8 +41,7 @@ function createRoom() {
             var video_local = document.getElementById("local-video");
             video_local.srcObject = localMediaStream;
             video_local.play();
-            document.getElementById('conteiner-call').style.display = 'block';
-            document.getElementById('conteiner-encerrar-chamada').style.display = 'block';
+            
           })
           .catch(function (err) {
             // Exibir mensagem de erro ao obter o stream de mídia
@@ -54,6 +58,12 @@ function createRoom() {
           // Exibir mensagem ao encerrar a chamada pelo outro lado
           devInfo.innerHTML = "Conexão de vídeo encerrada pelo outro lado.";
           // Adicione aqui qualquer lógica adicional necessária ao encerrar a chamada.
+          // Lógica de fechamento da chamada
+            document.getElementById('conteiner-formulário').style.display = 'block';
+            
+            // Oculta a div 'conteiner-call' onde a chamada é exibida
+            document.getElementById('conteiner-call').style.display = 'none';
+            document.getElementById('conteiner-encerrar-chamada').style.display = 'none';
         });
 
         peer.on("close", () => {
