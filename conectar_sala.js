@@ -1,6 +1,3 @@
-var peer;
-var devInfo = document.getElementById("info-messages");
-
 // Função para entrar em uma sala
 function joinRoom() {
   const destPeerId = document.getElementById("room-input").value.trim();
@@ -87,4 +84,5 @@ function joinRoom() {
       // Lógica de erro ao obter o stream de mídia
       devInfo.innerHTML = "Erro ao obter o stream de mídia, não é possível fazer streamer";
     });
-}
+           }
+    
