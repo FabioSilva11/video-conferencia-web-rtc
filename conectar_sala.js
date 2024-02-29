@@ -60,20 +60,19 @@ function joinRoom() {
             devInfo.innerHTML = "Chamada de vídeo encerrada.";
           });
 
-
-document
-          .getElementById("end-call-button")
-          .addEventListener("click", function () {
-            if (call) {
-              call.close();
-              // Exibir mensagem ao encerrar a chamada de vídeo
-              devInfo.innerHTML = "A chamada de vídeo será encerrada.";
-            } else {
-              // Exibir mensagem se a chamada não estiver definida
-              devInfo.innerHTML = "A chamada não está definida. Não é possível fechar.";
-            }
-          });
-      });
+          document
+            .getElementById("end-call-button")
+            .addEventListener("click", function () {
+              if (call) {
+                call.close();
+                // Lógica de encerramento da chamada
+                devInfo.innerHTML = "A chamada de vídeo será encerrada.";
+              } else {
+                // Lógica se o par não estiver definido
+                devInfo.innerHTML = "O par não está definido. Não é possível fechar.";
+              }
+            });
+        });
 
         conn.on("error", function (err) {
           // Lógica de erro na conexão
@@ -85,5 +84,5 @@ document
       // Lógica de erro ao obter o stream de mídia
       devInfo.innerHTML = "Erro ao obter o stream de mídia, não é possível fazer streamer";
     });
-                }
-                
+            }
+                                
