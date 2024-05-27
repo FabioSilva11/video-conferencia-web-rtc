@@ -1,6 +1,9 @@
 // Referência ao Realtime Database
 const database = firebase.database();
 
+// Variável para armazenar o temporizador de desconexão
+let disconnectTimeout;
+
 // Função para configurar o peer
 function setupPeer(roomId, callback) {
   const peer = new Peer(roomId, { config: turnConfig });
@@ -12,6 +15,17 @@ function setupPeer(roomId, callback) {
   peer.on("open", function (id) {
     devInfo.innerHTML = "Conectado com sucesso! ID: " + id;
     if (callback) callback(peer);
+  });
+
+  window.addEventListener("beforeunload", function () {
+    if (peer) {
+      peer.destroy();
+      database.ref('pairs').orderByChild('roomId').equalTo(roomId).once('value', snapshot => {
+        snapshot.forEach(childSnapshot => {
+          childSnapshot.ref.remove();
+        });
+      });
+    }
   });
 
   return peer;
@@ -26,7 +40,15 @@ function getLocalMedia(constraints) {
 function handleCall(call, localMediaStream) {
   call.answer(localMediaStream);
 
+  // Desconexão por tempo
+  disconnectTimeout = setTimeout(() => {
+    call.close();
+    devInfo.innerHTML = "Desconectado por tempo. Não recebeu o vídeo remoto.";
+    resetCallUI();
+  }, 10000); // 10 segundos de tempo limite
+
   call.on("stream", function (remoteStream) {
+    clearTimeout(disconnectTimeout);
     const remoteVideo = document.getElementById("remote-video");
     remoteVideo.srcObject = remoteStream;
     remoteVideo.play();
@@ -111,7 +133,7 @@ function createRoom(roomId) {
       video_local.play();
     })
     .catch(function (err) {
-      devInfo.innerHTML = "Erro ao obter o stream de mídia, não é possível fazer streamer";
+      devInfo.innerHTML = "Erro ao obter o stream de mídia, não é possível fazer streaming";
     });
 }
 
@@ -159,7 +181,7 @@ function joinRoom(roomId) {
       });
     })
     .catch(function (err) {
-      devInfo.innerHTML = "Erro ao obter o stream de mídia, não é possível fazer streamer";
+      devInfo.innerHTML = "Erro ao obter o stream de mídia, não é possível fazer streaming";
     });
 }
 
